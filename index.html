@@ -1,1 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact Form</title>
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    body {
+      background: linear-gradient(135deg, #f0f4ff, #eaf6f6);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    .contact-card {
+      background-color: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 1rem;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+      padding: 2rem;
+    }
+
+    .contact-header {
+      background: #4d7cfe;
+      color: white;
+      padding: 1rem;
+      border-radius: 0.75rem 0.75rem 0 0;
+      text-align: center;
+      margin: -2rem -2rem 2rem -2rem;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: #333;
+    }
+
+    .form-control {
+      border-radius: 0.5rem;
+      background-color: #f8fbff;
+      border: 1px solid #ccd6e0;
+    }
+
+    .form-control:focus {
+      border-color: #4d7cfe;
+      box-shadow: 0 0 0 0.2rem rgba(77, 124, 254, 0.25);
+    }
+
+    .form-select {
+      border-radius: 0.5rem;
+      background-color: #f8fbff;
+      border: 1px solid #ccd6e0;
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
+
+    .form-select:focus {
+      border-color: #4d7cfe;
+      box-shadow: 0 0 0 0.2rem rgba(77, 124, 254, 0.25);
+    }
+
+    .btn-custom {
+      background-color: #4d7cfe;
+      color: white;
+      font-weight: 500;
+      border-radius: 0.5rem;
+    }
+
+    .btn-custom:hover {
+      background-color: #395fd9;
+    }
+
+    .thank-you {
+      display: none;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #4d7cfe;
+      margin-top: 2rem;
+    }
+    .is-valid {
+  border-color: #28a745 !important;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+  </style>
+</head>
+<body>
+
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="contact-card">
+        <div class="contact-header">
+          <h4>Contact Us</h4>
+        </div>
+
+        <form id="contactForm" novalidate>
+          <div class="mb-3">
+            <label for="name" class="form-label">Your Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="name" name="name" required />
+            <div class="invalid-feedback">Please enter your name.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="mobile" class="form-label">Mobile Number <span class="text-danger">*</span></label>
+            <div class="d-flex gap-2">
+              <select class="form-select flex-shrink-0" id="countryCode" name="countryCode" aria-label="Country code" style="max-width: 100px;">
+                <option value="+91" selected>+91 India</option>
+                <option value="+1">+1 USA</option>
+                <option value="+44">+44 UK</option>
+                <option value="+61">+61 Australia</option>
+                <option value="+81">+81 Japan</option>
+                <!-- Add more country codes here if needed -->
+              </select>
+              <input type="tel" class="form-control" id="mobile" name="mobile" required pattern="^[0-9\s]{7,15}$" placeholder="Enter mobile number" />
+            </div>
+            <div class="invalid-feedback">Please enter a valid mobile number (7–15 digits, spaces allowed).</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email Address</label>
+            <input type="email" class="form-control" id="email" name="email" />
+            <div class="invalid-feedback">Please enter a valid email address.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="message" class="form-label">Your Message</label>
+            <textarea class="form-control" id="message" name="message" rows="4"></textarea>
+          </div>
+
+          <!-- Hidden input to hold combined full mobile number -->
+          <input type="hidden" id="fullMobile" name="fullMobile" />
+
+          <div class="d-grid">
+            <button type="submit" class="btn btn-custom">Send Message</button>
+          </div>
+        </form>
+
+        <div class="thank-you" id="thankYouMessage" aria-live="polite">
+          <p>✅ Thank you for showing interest. We will contact you soon!</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Validation and Thank You -->
+<script>
+ 
+const form = document.getElementById("contactForm");
+const thankYouMessage = document.getElementById("thankYouMessage");
+
+form.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  // Clear previous validation
+  form.classList.remove("was-validated");
+
+  let isValid = true;
+
+  // Validate Name: letters and spaces only, min 2 chars
+  const name = form.name.value.trim();
+  const nameRegex = /^[A-Za-z\s]{2,}$/;
+  if (!nameRegex.test(name)) {
+    isValid = false;
+    form.name.classList.add("is-invalid");
+  } else {
+    form.name.classList.remove("is-invalid");
+    form.name.classList.add("is-valid");
+  }
+
+  // Validate Mobile Number: only digits and spaces, length 7-15 digits (excluding spaces)
+  const mobile = form.mobile.value.trim();
+  const digitsOnly = mobile.replace(/\s/g, '');
+  const mobilePattern = /^[0-9\s]{7,15}$/;
+  if (!mobilePattern.test(mobile) || digitsOnly.length < 7 || digitsOnly.length > 15) {
+    isValid = false;
+    form.mobile.classList.add("is-invalid");
+  } else {
+    form.mobile.classList.remove("is-invalid");
+    form.mobile.classList.add("is-valid");
+  }
+
+  // Validate Email if present (optional)
+  const email = form.email.value.trim();
+  if (email.length > 0) {
+    // Basic email pattern
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+      isValid = false;
+      form.email.classList.add("is-invalid");
+    } else {
+      form.email.classList.remove("is-invalid");
+      form.email.classList.add("is-valid");
+    }
+  } else {
+    form.email.classList.remove("is-invalid");
+    form.email.classList.remove("is-valid");
+  }
+
+  // Validate Message max length 500 characters
+  const message = form.message.value;
+  if (message.length > 500) {
+    isValid = false;
+    form.message.classList.add("is-invalid");
+  } else {
+    form.message.classList.remove("is-invalid");
+    form.message.classList.add("is-valid");
+  }
+
+  if (!isValid) {
+    // Show validation styles on form
+    form.classList.add("was-validated");
+    return; // Stop submit
+  }
+
+  // Combine country code + mobile number into hidden input
+  const countryCode = form.countryCode.value.trim();
+  const fullMobile = countryCode + digitsOnly;
+  form.fullMobile.value = fullMobile;
+
+  form.style.display = "none";
+  thankYouMessage.style.display = "block";
+
+  form.classList.add("was-validated");
+});
+</script>
+</body>
+</html>
